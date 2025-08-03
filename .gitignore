@@ -50,3 +50,9 @@ release
 *.su
 *.idb
 *.pdb
+
+
+
+Drivers/
+*.launch
+*.ld
