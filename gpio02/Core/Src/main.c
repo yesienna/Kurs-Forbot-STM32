@@ -55,17 +55,30 @@ static void MX_GPIO_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+typedef struct {
+	GPIO_TypeDef* port;
+	uint16_t pin;
+}pin_t;
+
+static const pin_t LED[] = {
+		{ LED1_GPIO_Port, LED1_Pin },
+		{ LED2_GPIO_Port, LED2_Pin },
+		{ LED3_GPIO_Port, LED3_Pin },
+		{ LED4_GPIO_Port, LED4_Pin },
+		{ LED5_GPIO_Port, LED5_Pin },
+		{ LED6_GPIO_Port, LED6_Pin },
+		{ LED7_GPIO_Port, LED7_Pin },
+		{ LED8_GPIO_Port, LED8_Pin },
+		{ LED9_GPIO_Port, LED9_Pin },
+		{ LED10_GPIO_Port, LED10_Pin },
+};
+
 void led_set(int led, bool turn_on)
 {
-	GPIO_PinState state;
-	if (turn_on) {
-		state = GPIO_PIN_SET;
-	} else {
-		state = GPIO_PIN_RESET;
-	}
+	GPIO_PinState state = (turn_on) ? GPIO_PIN_SET : GPIO_PIN_RESET;
 	if (led >= 0 && led < 10) {
-		HAL_GPIO_WritePin(LED1_GPIO_Port, LED1_Pin << led, state);
-	}
+		HAL_GPIO_WritePin(LED[led].port, LED[led].pin, state);
+        }
 }
 
 /* USER CODE END 0 */
