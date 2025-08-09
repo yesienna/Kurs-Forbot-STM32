@@ -81,6 +81,14 @@ void led_set(int led, bool turn_on)
         }
 }
 
+bool is_button_pressed(void) {
+  if (HAL_GPIO_ReadPin(USER_BUTTON_GPIO_Port, USER_BUTTON_Pin) == GPIO_PIN_RESET) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -118,9 +126,27 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  int led = 0;
+  led_set(led, true);
+
   while (1)
   {
-	  for (int i = 0; i < 10; i++) {
+	  // sprawdź czy przycisk jest wciśnięty
+	  if (is_button_pressed()) {
+	  // jeśli tak to zgaś aktualną diodę
+	  led_set(led, false);
+	  // wybierz kolejną
+	  if (++led >= 10) {
+	    led = 0;
+	  }
+	  // zapal nową diodę
+	  led_set(led, true);
+	  // czekamy na zwolnienie przycisku
+	  while (is_button_pressed())
+	    {}
+	  }
+
+/*	  for (int i = 0; i < 10; i++) {
 	      // zapal diodę
 	      led_set(i, true);
 	      // poczekaj 100 ms
@@ -128,6 +154,8 @@ int main(void)
 	      // zgaś diodę
 	      led_set(i, false);
 	    }
+*/
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -192,12 +220,19 @@ static void MX_GPIO_Init(void)
   /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, LED6_Pin|LED7_Pin|LED8_Pin|LED9_Pin
                           |LED10_Pin|LED1_Pin|LED2_Pin|LED3_Pin
                           |LED4_Pin|LED5_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin : USER_BUTTON_Pin */
+  GPIO_InitStruct.Pin = USER_BUTTON_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(USER_BUTTON_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : LED6_Pin LED7_Pin LED8_Pin LED9_Pin
                            LED10_Pin LED1_Pin LED2_Pin LED3_Pin
