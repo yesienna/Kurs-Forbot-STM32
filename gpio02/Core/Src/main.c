@@ -81,14 +81,24 @@ void led_set(int led, bool turn_on)
         }
 }
 
-bool is_button_pressed(void) {
-  if (HAL_GPIO_ReadPin(USER_BUTTON_GPIO_Port, USER_BUTTON_Pin) == GPIO_PIN_RESET) {
-    return true;
-  } else {
+bool is_button_pressed(int button) {
+  switch (button) {
+  case 0:
+    if (HAL_GPIO_ReadPin(USER_BUTTON_GPIO_Port, USER_BUTTON_Pin) == GPIO_PIN_RESET) {
+      return true;
+    } else {
+      return false;
+    }
+  case 1:
+    if (HAL_GPIO_ReadPin(USER_BUTTON2_GPIO_Port, USER_BUTTON2_Pin) == GPIO_PIN_RESET) {
+      return true;
+    } else {
+      return false;
+    }
+  default:
     return false;
   }
 }
-
 /* USER CODE END 0 */
 
 /**
@@ -131,21 +141,39 @@ int main(void)
 
   while (1)
   {
-	  // sprawdź czy przycisk jest wciśnięty
-	  if (is_button_pressed()) {
-	  // jeśli tak to zgaś aktualną diodę
-	  led_set(led, false);
-	  // wybierz kolejną
-	  if (++led >= 10) {
-	    led = 0;
-	  }
-	  // zapal nową diodę
-	  led_set(led, true);
-	  // czekamy na zwolnienie przycisku
-	  while (is_button_pressed())
-	    {}
-	  }
+	  if (is_button_pressed(0)) {
+	  		// Po wcisnieciu przycisku wylacz diodę
+	  		led_set(led, false);
+	  		// Zwieksz zawartosc zmiennej led
+	  		led++;
+	  		// Sprawdz czy nie przekracza zakresu
+	  		if (led >= 10) {
+	  		  led = 0;
+	  		}
+	  		// Wlacz kolejna diode
+	  		led_set(led, true);
+	  		// czekamy na zwolnienie przycisku
+	  		while (is_button_pressed(0)) {}
+	  	}
+	  	if (is_button_pressed(1)) {
+	  		// Po wcisnieciu przycisku wylacz diodę
+	  		led_set(led, false);
+	  		// Zmniejsz zawartosc zmiennej led
+	  		led--;
+	  		// Sprawdz czy nie przekracza zakresu
+	  		if (led < 0) {
+	  		  led = 9;
+	  		}
+	  		// Wlacz kolejna diode
+	  		led_set(led, true);
 
+	  		HAL_Delay(20);
+
+	  		// czekamy na zwolnienie przycisku
+	  		while (is_button_pressed(1)) {}
+
+	  		HAL_Delay(20);
+	  	}
 /*	  for (int i = 0; i < 10; i++) {
 	      // zapal diodę
 	      led_set(i, true);
@@ -244,6 +272,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : USER_BUTTON2_Pin */
+  GPIO_InitStruct.Pin = USER_BUTTON2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  HAL_GPIO_Init(USER_BUTTON2_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
