@@ -121,8 +121,18 @@ int main(void)
   while (1)
   {
 	  uint8_t value;
-	  	  HAL_UART_Receive(&huart2, &value, 1, HAL_MAX_DELAY);
-	  	  printf("Odebrano: %c\n", value);
+
+	  	  if (HAL_UART_Receive(&huart2, &value, 1, 2000) == HAL_OK) {
+
+	  		  printf("Odebrano: %c\n", value);
+
+	  	  } else {
+
+	  		  printf(".");
+
+	  		  fflush(stdout);
+
+	  	  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
