@@ -69,6 +69,32 @@ int __io_putchar(int ch)
     return 1;
 }
 
+#define LINE_MAX_LENGTH	80
+static char line_buffer[LINE_MAX_LENGTH + 1];
+static uint32_t line_length;
+void line_append(uint8_t value)
+{
+	if (value == '\r' || value == '\n') {
+		// odebraliśmy znak końca linii
+		if (line_length > 0) {
+			// jeśli bufor nie jest pusty to dodajemy 0 na końcu linii
+			line_buffer[line_length] = '\0';
+			// przetwarzamy dane
+			printf("Otrzymano: %s\n", line_buffer);
+			// zaczynamy zbieranie danych od nowa
+			line_length = 0;
+		}
+	}
+	else {
+		if (line_length >= LINE_MAX_LENGTH) {
+			// za dużo danych, usuwamy wszystko co odebraliśmy dotychczas
+			line_length = 0;
+		}
+		// dopisujemy wartość do bufora
+		line_buffer[line_length++] = value;
+	}
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -122,6 +148,7 @@ int main(void)
   {
 	  uint8_t value;
 
+	  /*
 	  	  if (HAL_UART_Receive(&huart2, &value, 1, 2000) == HAL_OK) {
 
 	  		  printf("Odebrano: %c\n", value);
@@ -133,6 +160,13 @@ int main(void)
 	  		  fflush(stdout);
 
 	  	  }
+
+	  	*/
+
+	  	if (HAL_UART_Receive(&huart2, &value, 1, 0) == HAL_OK)
+
+	  		line_append(value);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
