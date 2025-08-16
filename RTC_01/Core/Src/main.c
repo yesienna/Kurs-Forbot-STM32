@@ -125,10 +125,28 @@ int main(void)
   {
 	  RTC_TimeTypeDef time;
 	  RTC_DateTypeDef date;
+
+	  // jeśli naciśnięto przycisk
+	  if (is_button_pressed()) {
+	  	// ważne: nieużywane pola muszą być wyzerowane
+	  	RTC_TimeTypeDef new_time = {0};
+
+	  	// czekamy na zwolnienie przycisku
+	  	while (is_button_pressed()) {}
+
+	  	// ustawiamy godzinę 07:45:00
+	  	new_time.Hours = 7;
+	  	new_time.Minutes = 45;
+	  	new_time.Seconds = 0;
+	  	HAL_RTC_SetTime(&hrtc, &new_time, RTC_FORMAT_BIN);
+	  }
+
 	  HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BIN);
 	  HAL_RTC_GetDate(&hrtc, &date, RTC_FORMAT_BIN);
-	  printf("Aktualny czas: %02d:%02d:%02d\n", time.Hours, time.Minutes, time.Seconds);
+
+	  printf("RTC: %02d:%02d:%02d\n", time.Hours, time.Minutes, time.Seconds);
 	  HAL_Delay(200);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -269,16 +287,12 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOA_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(USER_BUTTON_GPIO_Port, USER_BUTTON_Pin, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : USER_BUTTON_Pin */
   GPIO_InitStruct.Pin = USER_BUTTON_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(USER_BUTTON_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pin : LD2_Pin */
