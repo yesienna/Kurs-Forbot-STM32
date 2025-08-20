@@ -121,6 +121,13 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  RTC_DateTypeDef today;
+  today.Year = 25;
+  today.Month = 8;
+  today.Date = 20;
+  today.WeekDay = RTC_WEEKDAY_WEDNESDAY;
+  HAL_RTC_SetDate(&hrtc, &today, RTC_FORMAT_BIN);
+
   while (1)
   {
 	  RTC_TimeTypeDef time;
@@ -143,8 +150,7 @@ int main(void)
 
 	  HAL_RTC_GetTime(&hrtc, &time, RTC_FORMAT_BIN);
 	  HAL_RTC_GetDate(&hrtc, &date, RTC_FORMAT_BIN);
-
-	  printf("RTC: %02d:%02d:%02d\n", time.Hours, time.Minutes, time.Seconds);
+	  printf("RTC: %04d-%02d-%02d, %02d:%02d:%02d\n", 2000 + date.Year, date.Month, date.Date, time.Hours, time.Minutes, time.Seconds);
 	  HAL_Delay(200);
 
     /* USER CODE END WHILE */
