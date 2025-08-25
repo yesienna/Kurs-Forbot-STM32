@@ -56,6 +56,20 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void HAL_Delay(uint32_t Delay)
+{
+  uint32_t tickstart = HAL_GetTick();
+  uint32_t wait = Delay;
+  /* Add a period to guaranty minimum wait */
+  if (wait < HAL_MAX_DELAY)
+  {
+    wait += (uint32_t)uwTickFreq;
+  }
+  while ((HAL_GetTick() - tickstart) < wait)
+  {
+	  __WFI();
+  }
+}
 
 void start_measure(void)
 {
@@ -106,10 +120,17 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  start_measure();
+
 
   while (1)
   {
+		// wykonanie pomiaru
+		start_measure();
+		HAL_Delay(50);
+		stop_measure();
+
+		// 10s przerwy
+		HAL_Delay(10000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
