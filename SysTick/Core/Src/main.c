@@ -64,6 +64,12 @@ int __io_putchar(int ch)
   HAL_UART_Transmit(&huart2, (uint8_t*)&ch, 1, HAL_MAX_DELAY);
   return 1;
 }
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  if (GPIO_Pin == USER_BUTTON_Pin) {
+  }
+}
 /* USER CODE END 0 */
 
 /**
@@ -218,7 +224,7 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pin : USER_BUTTON_Pin */
   GPIO_InitStruct.Pin = USER_BUTTON_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(USER_BUTTON_GPIO_Port, &GPIO_InitStruct);
 
@@ -228,6 +234,10 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(LD2_GPIO_Port, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
