@@ -65,9 +65,19 @@ int __io_putchar(int ch)
   return 1;
 }
 
+/*
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
   if (GPIO_Pin == USER_BUTTON_Pin) {
+  }
+}
+*/
+
+volatile uint32_t push_counter;
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  if (GPIO_Pin == USER_BUTTON_Pin) {
+    push_counter++;
   }
 }
 /* USER CODE END 0 */
@@ -108,9 +118,14 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  uint32_t old_push_counter = push_counter;
   while (1)
   {
-	    printf("systick = %lu\n", HAL_GetTick());
+	//    printf("systick = %lu\n", HAL_GetTick());
+	    if (old_push_counter != push_counter) {
+	          old_push_counter = push_counter;
+	          printf("counter = %lu\n", old_push_counter);
+	        }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
