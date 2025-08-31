@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -80,6 +81,45 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
     push_counter++;
   }
 }
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
+{
+  if (huart == &huart2) {
+    send_next_message();
+  }
+}
+
+typedef enum {
+
+  MESSAGE_1,
+
+  MESSAGE_2,
+
+  DONE
+
+}sender_state;
+
+sender_state message_number = MESSAGE_1;
+
+void send_next_message(void)
+{
+  static char message[] = "Hello World!\r\n";
+  static char message2[] = "Forbot jest super!\r\n";
+  switch (message_number)
+  {
+  case MESSAGE_1:
+    HAL_UART_Transmit_IT(&huart2, (uint8_t*)message, strlen(message));
+    message_number = MESSAGE_2;
+    break;
+  case MESSAGE_2:
+    HAL_UART_Transmit_IT(&huart2, (uint8_t*)message2, strlen(message2));
+    message_number = DONE;
+    break;
+  default:
+    break;
+  }
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -113,6 +153,10 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+
+
+
+  send_next_message();
 
   /* USER CODE END 2 */
 
