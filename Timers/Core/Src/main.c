@@ -21,6 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "math.h"
 
 /* USER CODE END Includes */
 
@@ -58,6 +59,12 @@ static void MX_TIM6_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+float calc_pwm(float val)
+{
+    const float k = 0.13f;
+    const float x0 = 70.0f;
+    return 10000.0f / (1.0f + exp(-k * (val - x0)));
+}
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
@@ -145,8 +152,18 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  int counter = 0;
+
   while (1)
   {
+	  float r = 50 * (1.0f + sin(counter / 100.0f));
+	  float g = 50 * (1.0f + sin(1.5f * counter / 100.0f));
+	  float b = 50 * (1.0f + sin(2.0f * counter / 100.0f));
+	  __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, calc_pwm(b));
+	  __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, calc_pwm(g));
+	  __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_3, calc_pwm(r));
+	  HAL_Delay(10);
+	  counter++;
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -249,19 +266,19 @@ static void MX_TIM3_Init(void)
     Error_Handler();
   }
   sConfigOC.OCMode = TIM_OCMODE_PWM1;
-  sConfigOC.Pulse = 2500;
-  sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
+  sConfigOC.Pulse = 50;
+  sConfigOC.OCPolarity = TIM_OCPOLARITY_LOW;
   sConfigOC.OCFastMode = TIM_OCFAST_DISABLE;
   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_1) != HAL_OK)
   {
     Error_Handler();
   }
-  sConfigOC.Pulse = 5000;
+  sConfigOC.Pulse = 400;
   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
   {
     Error_Handler();
   }
-  sConfigOC.Pulse = 7500;
+  sConfigOC.Pulse = 2000;
   if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_3) != HAL_OK)
   {
     Error_Handler();
