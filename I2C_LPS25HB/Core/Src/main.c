@@ -132,11 +132,6 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  const float h = 37; // nasza wysokość n.p.m.
-  float temp = lps25hb_read_temp() + 273.15;
-  float p = lps25hb_read_pressure();
-  float p0 = p * exp(0.034162608734308 * h / temp);
-
   printf("Searching...\n");
   if (lps25hb_init() == HAL_OK) {
     printf("OK: LPS25HB\n");
@@ -144,14 +139,14 @@ int main(void)
     printf("Error: LPS25HB not found\n");
     Error_Handler();
   }
-  HAL_Delay(100);
-
-  lps25hb_set_calib(96);
-
+  HAL_Delay(5000);
+  float p0 = lps25hb_read_pressure();
   while (1)
   {
-    printf("T = %.1f*C\n", lps25hb_read_temp());
-    printf("p0 = %.2f hPa\n", p0);
+    float temp = lps25hb_read_temp() + 273.15;
+    float p = lps25hb_read_pressure();
+    float h = -29.271769 * temp * log(p / p0);
+    printf("h = %.2f m\n", h);
     HAL_Delay(1000);
     /* USER CODE END WHILE */
 
