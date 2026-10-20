@@ -25,6 +25,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
+#include "lps25hb.h"
+#include <math.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -130,20 +132,27 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  const float h = 37; // nasza wysokość n.p.m.
+  float temp = lps25hb_read_temp() + 273.15;
+  float p = lps25hb_read_pressure();
+  float p0 = p * exp(0.034162608734308 * h / temp);
+
   printf("Searching...\n");
-  uint8_t who_am_i = lps_read_reg(LPS25HB_WHO_AM_I);
-  if (who_am_i == 0xBD) {
-    printf("Found: LPS25HB\n");
-    lps_write_reg(LPS25HB_CTRL_REG1,  0xC0);
-    HAL_Delay(100);
-    int16_t temp;
-    HAL_I2C_Mem_Read(&hi2c1, LPS25HB_ADDR, LPS25HB_TEMP_OUT_L | 0x80, 1, (uint8_t*)&temp, sizeof(temp), HAL_MAX_DELAY);
-    printf("T = %.1f*C\n", 42.5f + temp / 480.0f);
+  if (lps25hb_init() == HAL_OK) {
+    printf("OK: LPS25HB\n");
   } else {
-    printf("Error: (0x%02X)\n", who_am_i);
+    printf("Error: LPS25HB not found\n");
+    Error_Handler();
   }
+  HAL_Delay(100);
+
+  lps25hb_set_calib(96);
+
   while (1)
   {
+    printf("T = %.1f*C\n", lps25hb_read_temp());
+    printf("p0 = %.2f hPa\n", p0);
+    HAL_Delay(1000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
